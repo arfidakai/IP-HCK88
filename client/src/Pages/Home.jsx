@@ -35,11 +35,8 @@ export default function Home() {
     localStorage.setItem(`chatHistory_${userId}`, JSON.stringify(messages));
   }, [messages, userId]);
 
-
   const clearHistory = () => {
-    if (
-      confirm("Yakin mau hapus seluruh riwayat chat kamu?")
-    ) {
+    if (confirm("Yakin mau hapus seluruh riwayat chat kamu?")) {
       localStorage.removeItem(`chatHistory_${userId}`);
       setMessages([]);
       setRecommendationKeyword("");
@@ -55,17 +52,19 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:8080/api/consult", {
-        message: chatInput,
-      });
+      const res = await axios.post(
+        "http://aicourse.arfidakai.site/api/consult",
+        { message: chatInput }
+      );
+
       const aiReply = res.data.reply;
       const aiMsg = { sender: "bot", text: aiReply };
       setMessages((prev) => [...prev, aiMsg]);
 
       const lowerReply = aiReply.toLowerCase();
       const keywordMatch = lowerReply.match(
-  /frontend|backend|fullstack|data|datascience|ai|machinelearning|deeplearning|ml|ui|ux|design|cyber|security|cloud|devops|network|database|sql|nosql|api|mobile|android|ios|web|software|game|blockchain|robotics|embedded|python|javascript|typescript|java|c\+\+|golang|php|ruby|react|node|express|django|flask|laravel|spring|aws|azure|gcp|firebase|docker|kubernetes|linux|testing|qa|automation/gi
-);
+        /frontend|backend|fullstack|data|datascience|ai|machinelearning|deeplearning|ml|ui|ux|design|cyber|security|cloud|devops|network|database|sql|nosql|api|mobile|android|ios|web|software|game|blockchain|robotics|embedded|python|javascript|typescript|java|c\+\+|golang|php|ruby|react|node|express|django|flask|laravel|spring|aws|azure|gcp|firebase|docker|kubernetes|linux|testing|qa|automation/gi
+      );
 
       if (keywordMatch && keywordMatch.length > 0) {
         setRecommendationKeyword(keywordMatch[0]);
@@ -80,9 +79,12 @@ export default function Home() {
 
   const fetchRecommendedVideos = async (keyword) => {
     try {
-      const res = await axios.post("http://localhost:8080/api/recommend", {
-        interest: keyword,
-      });
+      const res = await axios.post(
+        "http://aicourse.arfidakai.site/api/recommend",
+        {
+          interest: keyword,
+        }
+      );
       setRecommendedVideos(res.data.videos || []);
       setShowRecommendations(true);
     } catch (err) {
@@ -93,11 +95,12 @@ export default function Home() {
   const handleSave = async (video) => {
     try {
       setSaving(true);
-      await axios.post("http://localhost:8080/api/list", {
+      await axios.post("http://aicourse.arfidakai.site/api/list", {
         title: video.title,
         videoId: video.videoId,
         thumbnail: video.thumbnail,
       });
+
       alert(`✅ Video "${video.title}" berhasil disimpan ke daftar belajar!`);
     } catch (err) {
       console.error("Gagal menyimpan video:", err);
@@ -109,9 +112,13 @@ export default function Home() {
 
   const loadVideos = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/trending", {
-        params: { pageToken: nextPageToken },
-      });
+      const res = await axios.get(
+        "http://aicourse.arfidakai.site/api/trending",
+        {
+          params: { pageToken: nextPageToken },
+        }
+      );
+
       setVideos((prev) => [...prev, ...res.data.videos]);
       setNextPageToken(res.data.nextPageToken);
     } catch (err) {
@@ -140,8 +147,7 @@ export default function Home() {
           className="absolute top-4 right-4 text-[#00000080] hover:text-[#000000] text-sm"
           title="Hapus riwayat chat"
         >
-          🗑️
-          delete 
+          🗑️ delete
         </button>
 
         <h2 className="text-2xl font-bold text-[#A75D5D] mb-4 flex items-center gap-2">
@@ -171,7 +177,6 @@ export default function Home() {
             </div>
           )}
         </div>
-
 
         <div className="flex gap-2">
           <input

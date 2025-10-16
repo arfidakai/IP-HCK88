@@ -25,7 +25,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8080/api/login", form);
+      const res = await axios.post("http://localhost/api/login", form);
       localStorage.setItem("authToken", res.data.token);
       alert("✅ Login berhasil!");
       navigate("/");
@@ -38,7 +38,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/api/auth/google";
+    window.location.href = "http://localhost/api/auth/google";
   };
 
   return (
