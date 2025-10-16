@@ -48,7 +48,7 @@ router.get("/trending", async (req, res) => {
     });
 
     const videos = data.items
-      .filter((v) => !v.snippet.title.toLowerCase().includes("shorts")) // biar gak muncul video shorts
+      .filter((v) => !v.snippet.title.toLowerCase().includes("shorts"))
       .map((v) => ({
         videoId: v.id.videoId,
         title: v.snippet.title,

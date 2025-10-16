@@ -1,0 +1,21 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "aicourse",
+    "host": "localhost"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "aicourse_test",
+    "host": "localhost"
+  },
+  "production": {
+    "use_env_variable":"DATABASE_URL",
+    "username": "postgres",
+    "password": "postgres",
+    "database": "aicourse",
+    "host": "localhost"
+  }
+}

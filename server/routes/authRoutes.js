@@ -2,24 +2,19 @@ import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { User } from "../models/User.js"; // pastiin file User.js udah ada
+import { User } from "../models/User.js";
 import "../config/passport.js";
 
 const router = express.Router();
 
-/* ===========================
-   🔹 REGISTER MANUAL
-=========================== */
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // cek kalau email udah terdaftar
     const existing = await User.findOne({ where: { email } });
     if (existing)
       return res.status(400).json({ error: "Email sudah digunakan!" });
 
-    // hash password
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({ name, email, password: hash });
 
@@ -30,22 +25,16 @@ router.post("/register", async (req, res) => {
   }
 });
 
-/* ===========================
-   🔹 LOGIN MANUAL
-=========================== */
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // cari user
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).json({ error: "Email belum terdaftar." });
 
-    // verifikasi password
     const valid = await bcrypt.compare(password, user.password || "");
     if (!valid) return res.status(401).json({ error: "Password salah." });
 
-    // buat token JWT
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
@@ -59,9 +48,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-/* ===========================
-   🔹 LOGIN DENGAN GOOGLE
-=========================== */
 router.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -77,7 +63,6 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    // redirect ke frontend dgn token
     res.redirect(`http://localhost:5173/login?token=${token}`);
   }
 );
