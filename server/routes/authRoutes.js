@@ -63,7 +63,7 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    res.redirect(`http://localhost:5173/login?token=${token}`);
+    res.redirect(`https://aicourse-96cb2.web.app/login?token=${token}`);
   }
 );
 
