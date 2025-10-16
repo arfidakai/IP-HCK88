@@ -3,7 +3,6 @@ import axios from "axios";
 import ChatBubble from "../components/ChatBubble";
 import { jwtDecode } from "jwt-decode";
 import TrendingCard from "../components/TrendingCard";
-import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [chatInput, setChatInput] = useState("");
@@ -11,8 +10,10 @@ export default function Home() {
   const [nextPageToken, setNextPageToken] = useState(null);
   const [loading, setLoading] = useState(false);
   const [recommendationKeyword, setRecommendationKeyword] = useState("");
+  const [recommendedVideos, setRecommendedVideos] = useState([]);
+  const [showRecommendations, setShowRecommendations] = useState(false);
+  const [saving, setSaving] = useState(false);
   const loaderRef = useRef(null);
-  const navigate = useNavigate();
 
   const token = localStorage.getItem("authToken");
   let userId = "guest";
@@ -35,9 +36,19 @@ export default function Home() {
   }, [messages, userId]);
 
 
+  const clearHistory = () => {
+    if (
+      confirm("Yakin mau hapus seluruh riwayat chat kamu?")
+    ) {
+      localStorage.removeItem(`chatHistory_${userId}`);
+      setMessages([]);
+      setRecommendationKeyword("");
+      setShowRecommendations(false);
+    }
+  };
+
   const sendMessage = async () => {
     if (!chatInput.trim()) return;
-
     const userMsg = { sender: "user", text: chatInput };
     setMessages((prev) => [...prev, userMsg]);
     setChatInput("");
@@ -53,16 +64,46 @@ export default function Home() {
 
       const lowerReply = aiReply.toLowerCase();
       const keywordMatch = lowerReply.match(
-        /frontend|backend|data|ui|ux|cyber|ai|cloud|devops|security|mobile|android|web|fullstack|python|aws|react|node/gi
-      );
+  /frontend|backend|fullstack|data|datascience|ai|machinelearning|deeplearning|ml|ui|ux|design|cyber|security|cloud|devops|network|database|sql|nosql|api|mobile|android|ios|web|software|game|blockchain|robotics|embedded|python|javascript|typescript|java|c\+\+|golang|php|ruby|react|node|express|django|flask|laravel|spring|aws|azure|gcp|firebase|docker|kubernetes|linux|testing|qa|automation/gi
+);
+
       if (keywordMatch && keywordMatch.length > 0) {
-        const keyword = keywordMatch[0];
-        setRecommendationKeyword(keyword);
+        setRecommendationKeyword(keywordMatch[0]);
+        setShowRecommendations(false);
       }
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecommendedVideos = async (keyword) => {
+    try {
+      const res = await axios.post("http://localhost:8080/api/recommend", {
+        interest: keyword,
+      });
+      setRecommendedVideos(res.data.videos || []);
+      setShowRecommendations(true);
+    } catch (err) {
+      console.error("Gagal ambil rekomendasi:", err);
+    }
+  };
+
+  const handleSave = async (video) => {
+    try {
+      setSaving(true);
+      await axios.post("http://localhost:8080/api/list", {
+        title: video.title,
+        videoId: video.videoId,
+        thumbnail: video.thumbnail,
+      });
+      alert(`✅ Video "${video.title}" berhasil disimpan ke daftar belajar!`);
+    } catch (err) {
+      console.error("Gagal menyimpan video:", err);
+      alert("❌ Gagal menyimpan video.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -86,15 +127,23 @@ export default function Home() {
       { threshold: 1 }
     );
     if (loaderRef.current) observer.observe(loaderRef.current);
-    return () => {
-      if (loaderRef.current) observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, [loaderRef.current]);
 
   return (
     <div className="space-y-12">
       {/* Chatbot Section */}
-      <section className="bg-[#FFF5EF] shadow rounded-xl p-6">
+      <section className="bg-[#FFF5EF] shadow rounded-xl p-6 relative">
+        {/* tombol hapus */}
+        <button
+          onClick={clearHistory}
+          className="absolute top-4 right-4 text-[#00000080] hover:text-[#000000] text-sm"
+          title="Hapus riwayat chat"
+        >
+          🗑️
+          delete 
+        </button>
+
         <h2 className="text-2xl font-bold text-[#A75D5D] mb-4 flex items-center gap-2">
           🤖 Konsultasi Minat Belajar
         </h2>
@@ -102,7 +151,6 @@ export default function Home() {
           Ceritakan minatmu, dan AI akan bantu saranin bidang belajar terbaik!
         </p>
 
-        {/* Chat Area */}
         <div className="border border-[#FFC3A1] rounded-lg p-4 h-64 overflow-y-auto mb-4 bg-[#FFECE2]">
           {messages.length === 0 ? (
             <p className="text-[#A75D5D80] italic text-center mt-16">
@@ -124,7 +172,7 @@ export default function Home() {
           )}
         </div>
 
-        {/* Chat Input */}
+
         <div className="flex gap-2">
           <input
             type="text"
@@ -147,28 +195,53 @@ export default function Home() {
           </button>
         </div>
 
-        {recommendationKeyword && (
+        {recommendationKeyword && !showRecommendations && (
           <div className="mt-4 text-right">
             <button
-              onClick={() =>
-                navigate(`/recommend?interest=${recommendationKeyword}`)
-              }
+              onClick={() => fetchRecommendedVideos(recommendationKeyword)}
               className="bg-[#F0997D] hover:bg-[#FFC3A1] text-white px-4 py-2 rounded-lg shadow transition"
             >
-              🎯 Lihat Rekomendasi Belajar “{recommendationKeyword}”
+              🎓 Lihat Rekomendasi Belajar “{recommendationKeyword}”
             </button>
           </div>
         )}
       </section>
 
-      {/* Trending Videos Section */}
+      {showRecommendations && (
+        <section>
+          <h2 className="text-2xl font-semibold text-[#A75D5D] mb-4">
+            🎥 Rekomendasi Belajar “{recommendationKeyword}”
+          </h2>
+          {recommendedVideos.length === 0 ? (
+            <p className="text-[#A75D5D80] italic">
+              Belum ada video yang direkomendasikan.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {recommendedVideos.map((v, i) => (
+                <TrendingCard
+                  key={v.videoId + i}
+                  video={v}
+                  onSave={handleSave}
+                />
+              ))}
+            </div>
+          )}
+          {saving && (
+            <p className="text-[#5C3A3A] italic text-sm mt-2">
+              ⏳ Menyimpan ke daftar belajar...
+            </p>
+          )}
+        </section>
+      )}
+
       <section>
         <h2 className="text-2xl font-semibold text-[#000000] mb-4">
           🔥 Video Trending IT
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {videos.map((v, i) => (
-            <TrendingCard key={v.videoId + i} video={v} />
+            <TrendingCard key={v.videoId + i} video={v} onSave={handleSave} />
           ))}
         </div>
         <div ref={loaderRef} className="text-center py-4 text-[#00000080]">
