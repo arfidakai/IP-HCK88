@@ -34,30 +34,33 @@ router.post("/recommend", async (req, res) => {
 router.get("/trending", async (req, res) => {
   const { pageToken } = req.query;
   try {
-    const { data } = await axios.get(`${YT_API}/videos`, {
+    const { data } = await axios.get(`${YT_API}/search`, {
       params: {
         part: "snippet",
-        chart: "mostPopular",
+        q: "programming tutorial OR web development OR backend development OR frontend development OR data science OR python tutorial OR machine learning course OR cloud computing OR devops tutorial",
+        type: "video",
+        maxResults: 1000,
+        order: "viewCount",
         regionCode: "US",
-        videoCategoryId: "28",
-        maxResults: 10,
         key: YT_KEY,
         pageToken: pageToken || "",
       },
     });
 
-    const videos = data.items.map((v) => ({
-      videoId: v.id,
-      title: v.snippet.title,
-      thumbnail: v.snippet.thumbnails.medium.url,
-    }));
+    const videos = data.items
+      .filter((v) => !v.snippet.title.toLowerCase().includes("shorts")) // biar gak muncul video shorts
+      .map((v) => ({
+        videoId: v.id.videoId,
+        title: v.snippet.title,
+        thumbnail: v.snippet.thumbnails.medium.url,
+      }));
 
     res.json({
       videos,
       nextPageToken: data.nextPageToken,
     });
   } catch (err) {
-    console.error(err);
+    console.error("🔥 Failed to fetch trending tech videos:", err.message);
     res.status(500).json({ error: "Failed to load trending videos" });
   }
 });
