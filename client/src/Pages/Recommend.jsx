@@ -22,7 +22,7 @@ export default function Recommend() {
   const getRecommendations = async (keyword) => {
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8080/api/recommend", {
+      const res = await axios.post("http://localhost/api/recommend", {
         interest: keyword,
       });
       setVideos(res.data.videos || []);
@@ -37,7 +37,7 @@ export default function Recommend() {
   const handleSave = async (video) => {
     try {
       setSaving(true);
-      await axios.post("http://localhost:8080/api/list", {
+      await axios.post("http://localhost/api/list", {
         title: video.title,
         videoId: video.videoId,
         thumbnail: video.thumbnail,
