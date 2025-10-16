@@ -15,7 +15,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost/api/register", form);
+      await axios.post("http://aicourse.arfidakai.site/api/register", form);
       alert("✅ Akun berhasil dibuat! Silakan login.");
       navigate("/login");
     } catch (err) {
@@ -27,7 +27,7 @@ export default function Register() {
   };
 
   const handleGoogleRegister = () => {
-    window.location.href = "http://localhost/api/auth/google";
+    window.location.href = "http://aicourse.arfidakai.site/api/auth/google";
   };
 
   return (

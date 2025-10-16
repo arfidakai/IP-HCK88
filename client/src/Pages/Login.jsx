@@ -25,7 +25,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost/api/login", form);
+      const res = await axios.post("http://aicourse.arfidakai.site/api/login", form);
       localStorage.setItem("authToken", res.data.token);
       alert("✅ Login berhasil!");
       navigate("/");
@@ -38,7 +38,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost/api/auth/google";
+    window.location.href = "http://aicourse.arfidakai.site/api/auth/google";
   };
 
   return (
