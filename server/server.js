@@ -5,11 +5,11 @@ import { sequelize } from "./models/index.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import videoRoutes from "./routes/videoRoutes.js";
 import listRoutes from "./routes/listRoutes.js";
-
+import authRoutes from "./routes/authRoutes.js";
 import passport from "passport";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import authRoutes from "./routes/authRoutes.js";
+
 import "./config/passport.js";
 
 import { User } from "./models/User.js";
@@ -18,8 +18,7 @@ try {
   await sequelize.authenticate();
   console.log("✅ Connected to Supabase database!");
 
-  // sync semua model ke database
-  await sequelize.sync({ alter: true }); // pakai alter biar update tabel kalau ada perubahan
+  await sequelize.sync({ alter: true });
   console.log("✅ Database synced!");
 } catch (err) {
   console.error("❌ Database connection failed:", err);
@@ -27,8 +26,7 @@ try {
 
 dotenv.config();
 
-const app = express(); // ✅ inisialisasi dulu baru pakai
-
+const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
@@ -52,7 +50,10 @@ try {
   console.error("❌ Database connection failed:", err);
 }
 
-const PORT = 8080;
+const PORT = process.env.PORT || 3000;
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config();
+}
 app.listen(PORT, () =>
   console.log(`🚀 Server running on http://localhost:${PORT}`)
 );
