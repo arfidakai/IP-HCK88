@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import TrendingCard from "../components/TrendingCard";
+import Swal from "sweetalert2";
+
 
 export default function Recommend() {
   const location = useLocation();
@@ -42,10 +44,23 @@ export default function Recommend() {
         videoId: video.videoId,
         thumbnail: video.thumbnail,
       });
-      alert(`✅ Video "${video.title}" berhasil disimpan ke daftar belajar!`);
+      // alert(`✅ Video "${video.title}" berhasil disimpan ke daftar belajar!`);
+      Swal.fire({
+  icon: "success",
+  title: "Berhasil!",
+  text: "Video berhasil disimpan ke daftar belajar!",
+  confirmButtonColor: "#A75D5D",
+});
+
     } catch (err) {
       console.error("Gagal menyimpan video:", err);
-      alert("❌ Gagal menyimpan video.");
+      Swal.fire({
+  icon: "error",
+  title: "Gagal!",
+  text: "Gagal menyimpan video. Coba lagi ya!",
+  confirmButtonColor: "#A75D5D",
+});
+
     } finally {
       setSaving(false);
     }

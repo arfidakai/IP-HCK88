@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+
 
 export default function Login() {
   const navigate = useNavigate();
@@ -27,11 +29,21 @@ export default function Login() {
     try {
       const res = await axios.post("https://aicourse.arfidakai.site/api/login", form);
       localStorage.setItem("authToken", res.data.token);
-      alert("✅ Login berhasil!");
+       Swal.fire({
+        icon: "success",
+        title: "Login berhasil!",
+        text: "Selamat datang kembali 👋",
+        confirmButtonColor: "#A75D5D",
+      });
       navigate("/");
     } catch (err) {
       console.error(err);
-      alert("❌ Email atau password salah!");
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Login",
+        text: "Email atau password salah!",
+        confirmButtonColor: "#A75D5D",
+      });
     } finally {
       setLoading(false);
     }
@@ -89,7 +101,7 @@ export default function Login() {
           className="flex items-center justify-center gap-2 bg-[#F0997D] hover:bg-[#FFC3A1] text-white px-4 py-2 rounded-lg shadow w-full transition duration-300"
         >
           <img
-            src="httpss://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             alt="Google"
             className="w-5 h-5"
           />
