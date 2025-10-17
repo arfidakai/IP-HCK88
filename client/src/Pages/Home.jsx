@@ -37,15 +37,33 @@ export default function Home() {
     localStorage.setItem(`chatHistory_${userId}`, JSON.stringify(messages));
   }, [messages, userId]);
 
-  const clearHistory = () => {
-    if (confirm("Yakin mau hapus seluruh riwayat chat kamu?")) {
-      localStorage.removeItem(`chatHistory_${userId}`);
-      setMessages([]);
-      setRecommendationKeyword("");
-      setShowRecommendations(false);
-    }
-  };
+  const clearHistory = async () => {
+  const result = await Swal.fire({
+    title: "Hapus Riwayat Chat?",
+    text: "Yakin mau hapus seluruh riwayat chat kamu? Aksi ini tidak bisa dibatalkan.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Ya, hapus semua",
+    cancelButtonText: "Batal",
+  });
 
+  if (!result.isConfirmed) return;
+
+  localStorage.removeItem(`chatHistory_${userId}`);
+  setMessages([]);
+  setRecommendationKeyword("");
+  setShowRecommendations(false);
+
+  await Swal.fire({
+    title: "Berhasil!",
+    text: "Riwayat chat kamu sudah dihapus.",
+    icon: "success",
+    timer: 1500,
+    showConfirmButton: false,
+  });
+};
   const sendMessage = async () => {
     if (!chatInput.trim()) return;
     const userMsg = { sender: "user", text: chatInput };
