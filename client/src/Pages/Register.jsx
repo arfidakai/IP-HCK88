@@ -15,7 +15,7 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://aicourse.arfidakai.site/api/register", form);
+      await axios.post("https://aicourse.arfidakai.site/api/register", form);
       alert("✅ Akun berhasil dibuat! Silakan login.");
       navigate("/login");
     } catch (err) {
@@ -27,7 +27,7 @@ export default function Register() {
   };
 
   const handleGoogleRegister = () => {
-    window.location.href = "http://aicourse.arfidakai.site/api/auth/google";
+    window.location.href = "https://aicourse.arfidakai.site/api/auth/google";
   };
 
   return (
@@ -89,7 +89,7 @@ export default function Register() {
           className="flex items-center justify-center gap-2 bg-[#F0997D] hover:bg-[#FFC3A1] text-white px-4 py-2 rounded-lg shadow w-full transition duration-300"
         >
           <img
-            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            src="httpss://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             alt="Google"
             className="w-5 h-5"
           />

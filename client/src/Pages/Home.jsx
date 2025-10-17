@@ -53,7 +53,7 @@ export default function Home() {
 
     try {
       const res = await axios.post(
-        "http://aicourse.arfidakai.site/api/consult",
+        "https://aicourse.arfidakai.site/api/consult",
         { message: chatInput }
       );
 
@@ -80,7 +80,7 @@ export default function Home() {
   const fetchRecommendedVideos = async (keyword) => {
     try {
       const res = await axios.post(
-        "http://aicourse.arfidakai.site/api/recommend",
+        "https://aicourse.arfidakai.site/api/recommend",
         {
           interest: keyword,
         }
@@ -95,7 +95,7 @@ export default function Home() {
   const handleSave = async (video) => {
     try {
       setSaving(true);
-      await axios.post("http://aicourse.arfidakai.site/api/list", {
+      await axios.post("https://aicourse.arfidakai.site/api/list", {
         title: video.title,
         videoId: video.videoId,
         thumbnail: video.thumbnail,
@@ -113,7 +113,7 @@ export default function Home() {
   const loadVideos = async () => {
     try {
       const res = await axios.get(
-        "http://aicourse.arfidakai.site/api/trending",
+        "https://aicourse.arfidakai.site/api/trending",
         {
           params: { pageToken: nextPageToken },
         }
