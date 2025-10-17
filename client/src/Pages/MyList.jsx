@@ -9,7 +9,7 @@ export default function MyList() {
   const loadList = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://aicourse.arfidakai.site/api/list");
+      const res = await axios.get("https://aicourse.arfidakai.site/api/list");
       setList(res.data);
     } catch (err) {
       console.error(err);
@@ -21,7 +21,7 @@ export default function MyList() {
   const toggleStatus = async (id, currentStatus) => {
     try {
       const newStatus = currentStatus === "belum" ? "selesai" : "belum";
-      await axios.put(`http://aicourse.arfidakai.site/api/list/${id}`, {
+      await axios.put(`https://aicourse.arfidakai.site/api/list/${id}`, {
         status: newStatus,
       });
       setList((prev) =>
@@ -37,7 +37,7 @@ export default function MyList() {
   const removeFromList = async (id) => {
     if (!confirm("Yakin mau hapus video ini?")) return;
     try {
-      await axios.delete(`http://aicourse.arfidakai.site/api/list/${id}`);
+      await axios.delete(`https://aicourse.arfidakai.site/api/list/${id}`);
       setList((prev) => prev.filter((v) => v.id !== id));
     } catch (err) {
       console.error(err);

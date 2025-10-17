@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api": "http://aicourse.arfidakai.site",
+      "/api": "https://aicourse.arfidakai.site",
     },
   },
 });
