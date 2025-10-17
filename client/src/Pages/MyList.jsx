@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function MyList() {
   const [list, setList] = useState([]);
@@ -35,14 +36,39 @@ export default function MyList() {
   };
 
   const removeFromList = async (id) => {
-    if (!confirm("Yakin mau hapus video ini?")) return;
-    try {
-      await axios.delete(`https://aicourse.arfidakai.site/api/list/${id}`);
-      setList((prev) => prev.filter((v) => v.id !== id));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const result = await Swal.fire({
+    title: "Hapus Video?",
+    text: "Yakin mau hapus video ini dari daftar?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Ya, hapus",
+    cancelButtonText: "Batal",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await axios.delete(`https://aicourse.arfidakai.site/api/list/${id}`);
+    setList((prev) => prev.filter((v) => v.id !== id));
+
+    Swal.fire({
+      title: "Berhasil!",
+      text: "Video berhasil dihapus dari daftar kamu.",
+      icon: "success",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      title: "Gagal!",
+      text: "Terjadi kesalahan saat menghapus video.",
+      icon: "error",
+    });
+  }
+};
 
   useEffect(() => {
     loadList();
