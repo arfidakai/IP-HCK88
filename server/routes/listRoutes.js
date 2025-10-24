@@ -11,6 +11,7 @@ function getUserId(req) {
 // === Get semua video untuk user ===
 router.get("/list", async (req, res) => {
   try {
+    console.log("📩 Body diterima dari frontend:", req.body);
     const { title, videoId, thumbnail, listName, userId } = req.body;
 
     if (!userId) {

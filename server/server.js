@@ -18,7 +18,7 @@ try {
   await sequelize.authenticate();
   console.log("✅ Connected to Supabase database!");
 
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
   console.log("✅ Database synced!");
 } catch (err) {
   console.error("❌ Database connection failed:", err);
