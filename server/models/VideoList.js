@@ -9,4 +9,9 @@ export const VideoList = sequelize.define("VideoList", {
     type: DataTypes.ENUM("belum", "selesai"),
     defaultValue: "belum",
   },
+  userId: {
+    // ubah dulu jadi boleh null sementara
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 });
