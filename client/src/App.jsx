@@ -10,8 +10,9 @@ import Register from "./Pages/Register";
 export default function App() {
   return (
     <BrowserRouter>
+     <div className="bg-[#FFF8F5] min-h-screen text-[#5C3A3A]">
       <Navbar />
-      <div className="p-6">
+       <main className="pt-[80px] px-4 sm:px-6 pb-10 max-w-7xl mx-auto">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -40,7 +41,8 @@ export default function App() {
             }
           />
         </Routes>
-      </div>
+       </main>
+     </div>
     </BrowserRouter>
   );
 }

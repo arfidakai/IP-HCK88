@@ -1,6 +1,6 @@
 export default function SavedCard({ item, onDelete }) {
   return (
-    <div className="flex items-center justify-between bg-white shadow p-3 rounded-lg">
+  <div className="flex items-center justify-between bg-white shadow-md hover:shadow-lg p-4 rounded-xl transition-all duration-300">
       <div className="flex items-center gap-3">
         <img
           src={item.thumbnail}

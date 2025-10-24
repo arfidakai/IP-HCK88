@@ -17,16 +17,24 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const loaderRef = useRef(null);
 
-  const token = localStorage.getItem("authToken");
-  let userId = "guest";
-  if (token) {
-    try {
-      const decoded = jwtDecode(token);
-      userId = decoded.id || "guest";
-    } catch (e) {
-      console.error("Token decode error:", e);
-    }
+  const rawToken =
+  localStorage.getItem("authToken") ||
+  localStorage.getItem("token") ||
+  localStorage.getItem("accessToken") ||
+  null;
+
+const token = rawToken ? (rawToken.startsWith("Bearer ") ? rawToken.split(" ")[1] : rawToken) : null;
+const authHeader = rawToken ? (rawToken.startsWith("Bearer ") ? rawToken : `Bearer ${rawToken}`) : null;
+
+let userId = "guest";
+if (token) {
+  try {
+    const decoded = jwtDecode(token);
+    userId = decoded?.id || decoded?.userId || decoded?.sub || "guest";
+  } catch (e) {
+    console.error("Token decode error:", e);
   }
+}
 
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem(`chatHistory_${userId}`);
@@ -115,28 +123,34 @@ export default function Home() {
   const handleSave = async (video) => {
     try {
       setSaving(true);
-      await axios.post("https://aicourse.arfidakai.site/api/list", {
+
+      const body = {
         title: video.title,
         videoId: video.videoId,
         thumbnail: video.thumbnail,
+        ...(userId && userId !== "guest" ? { userId: Number(userId) } : {}),
+      };
+
+      const headers = authHeader
+        ? { Authorization: authHeader, "Content-Type": "application/json" }
+        : { "Content-Type": "application/json" };
+
+      await axios.post("https://aicourse.arfidakai.site/api/list", body, { headers });
+
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Video berhasil disimpan ke daftar belajar!",
+        confirmButtonColor: "#A75D5D",
       });
-
-    Swal.fire({
-  icon: "success",
-  title: "Berhasil!",
-  text: "Video berhasil disimpan ke daftar belajar!",
-  confirmButtonColor: "#A75D5D",
-});
-
     } catch (err) {
       console.error("Gagal menyimpan video:", err);
       Swal.fire({
-  icon: "error",
-  title: "Gagal!",
-  text: "Gagal menyimpan video. Coba lagi ya!",
-  confirmButtonColor: "#A75D5D",
-});
-
+        icon: "error",
+        title: "Gagal!",
+        text: "Gagal menyimpan video. Coba lagi ya!",
+        confirmButtonColor: "#A75D5D",
+      });
     } finally {
       setSaving(false);
     }
@@ -170,9 +184,9 @@ export default function Home() {
   }, [loaderRef.current]);
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10">
       {/* Chatbot Section */}
-      <section className="bg-[#FFF5EF] shadow rounded-xl p-6 relative">
+     <section className="bg-[#FFF5EF] shadow rounded-xl p-6">
         {/* tombol hapus */}
         <button
           onClick={clearHistory}
@@ -198,7 +212,8 @@ export default function Home() {
             messages.map((msg, idx) => (
               <ChatBubble key={idx} sender={msg.sender} text={msg.text} />
             ))
-          )}
+          )
+          }
           {loading && (
             <div className="flex justify-start mb-2">
               <div className="bg-[#FFC3A1] text-[#5C3A3A] px-3 py-2 rounded-2xl inline-flex items-center gap-1">
@@ -254,7 +269,7 @@ export default function Home() {
               Belum ada video yang direkomendasikan.
             </p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {recommendedVideos.map((v, i) => (
                 <TrendingCard
                   key={v.videoId + i}
@@ -276,7 +291,7 @@ export default function Home() {
         <h2 className="text-2xl font-semibold text-[#000000] mb-4">
           🔥 Video Trending IT
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {videos.map((v, i) => (
             <TrendingCard key={v.videoId + i} video={v} onSave={handleSave} />
           ))}

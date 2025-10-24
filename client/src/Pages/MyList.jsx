@@ -1,72 +1,52 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 
 export default function MyList() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("all");
+  const token = localStorage.getItem("authToken");
+const userId = token ? (() => { try { return jwtDecode(token).id } catch { return null } })() : null;
 
   const loadList = async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get("https://aicourse.arfidakai.site/api/list");
-      setList(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const res = await axios.get("https://aicourse.arfidakai.site/api/list", {
+      params: { userId } // ⬅️ kirim userId di query
+    });
+    setList(res.data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const toggleStatus = async (id, currentStatus) => {
-    try {
-      const newStatus = currentStatus === "belum" ? "selesai" : "belum";
-      await axios.put(`https://aicourse.arfidakai.site/api/list/${id}`, {
-        status: newStatus,
-      });
-      setList((prev) =>
-        prev.map((v) =>
-          v.id === id ? { ...v, status: newStatus } : v
-        )
-      );
-    } catch (err) {
-      console.error(err);
-    }
-  };
+const toggleStatus = async (id, currentStatus) => {
+  try {
+    const newStatus = currentStatus === "belum" ? "selesai" : "belum";
+    await axios.put(`https://aicourse.arfidakai.site/api/list/${id}?userId=${userId}`, {
+      status: newStatus,
+    });
+    setList(prev => prev.map(v => v.id === id ? { ...v, status: newStatus } : v));
+  } catch (err) {
+    console.error(err);
+  }
+};
 
-  const removeFromList = async (id) => {
-  const result = await Swal.fire({
-    title: "Hapus Video?",
-    text: "Yakin mau hapus video ini dari daftar?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Ya, hapus",
-    cancelButtonText: "Batal",
-  });
-
+const removeFromList = async (id) => {
+  const result = await Swal.fire({ /* ... */ });
   if (!result.isConfirmed) return;
 
   try {
-    await axios.delete(`https://aicourse.arfidakai.site/api/list/${id}`);
-    setList((prev) => prev.filter((v) => v.id !== id));
-
-    Swal.fire({
-      title: "Berhasil!",
-      text: "Video berhasil dihapus dari daftar kamu.",
-      icon: "success",
-      timer: 1500,
-      showConfirmButton: false,
-    });
+    await axios.delete(`https://aicourse.arfidakai.site/api/list/${id}?userId=${userId}`);
+    setList(prev => prev.filter(v => v.id !== id));
+    Swal.fire({ icon: "success", title: "Berhasil!", text: "Video dihapus." });
   } catch (err) {
     console.error(err);
-    Swal.fire({
-      title: "Gagal!",
-      text: "Terjadi kesalahan saat menghapus video.",
-      icon: "error",
-    });
+    Swal.fire({ icon: "error", title: "Gagal!", text: "Tidak bisa menghapus video." });
   }
 };
 
@@ -80,7 +60,7 @@ export default function MyList() {
       : list.filter((v) => v.status === filter);
 
   return (
-    <div className="p-6 space-y-6">
+   <div className="space-y-8">
       <h1 className="text-3xl font-bold text-[#A75D5D] mb-4">
         🎯 Daftar Belajar Saya
       </h1>
