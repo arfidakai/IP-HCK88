@@ -35,8 +35,13 @@ router.get("/list", async (req, res) => {
  */
 router.post("/list", async (req, res) => {
   try {
-    const userId = pickUserId(req);
-    if (!userId) return res.status(400).json({ error: "userId required" });
+    console.log("📩 Body dari frontend:", req.body);
+
+    const userId = req.body.userId || req.query.userId;
+    if (!userId) {
+      console.warn("⚠️ Tidak ada userId dikirim dari frontend");
+      return res.status(400).json({ error: "userId required" });
+    }
 
     const { title, videoId, thumbnail, listName } = req.body;
     const video = await VideoList.create({
@@ -47,10 +52,12 @@ router.post("/list", async (req, res) => {
       status: "belum",
       userId,
     });
-    return res.json(video);
+
+    console.log("✅ Video disimpan:", video.dataValues);
+    res.json(video);
   } catch (err) {
-    console.error("POST /list error:", err);
-    return res.status(500).json({ error: "Gagal menambah video" });
+    console.error("❌ Gagal menambah video:", err);
+    res.status(500).json({ error: "Gagal menambah video" });
   }
 });
 
