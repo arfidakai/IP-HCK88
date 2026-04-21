@@ -9,7 +9,13 @@ const router = express.Router();
 
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password } = req.body || {};
+
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ error: "name, email, and password are required" });
+    }
 
     const existing = await User.findOne({ where: { email } });
     if (existing)
@@ -21,13 +27,18 @@ router.post("/register", async (req, res) => {
     res.json({ success: true, user });
   } catch (err) {
     console.error("❌ Register error:", err);
-    res.status(500).json({ error: "Gagal membuat akun." });
+    const message = err?.errors?.[0]?.message || err.message || "Gagal membuat akun.";
+    res.status(500).json({ error: message });
   }
 });
 
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "email and password are required" });
+    }
 
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(404).json({ error: "Email belum terdaftar." });
@@ -63,7 +74,8 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    res.redirect(`https://aicourse-96cb2.web.app/login?token=${token}`);
+    const clientRedirect = process.env.CLIENT_REDIRECT_URL || "http://localhost:5173/login";
+    res.redirect(`${clientRedirect}?token=${token}`);
   }
 );
 

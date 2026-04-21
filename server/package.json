@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "dev": "NODE_ENV=test node server.js",
+    "start": "npm run dev",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --forceExit --verbose --detectOpenHandles --coverage"
   },
   "keywords": [],
@@ -11,6 +13,7 @@
   "description": "",
   "dependencies": {
     "@google/genai": "^1.25.0",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { api, API_BASE } from "../lib/api";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -17,20 +17,21 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("https://aicourse.arfidakai.site/api/register", form);
+      await api.post("/register", form);
       // alert("✅ Akun berhasil dibuat! Silakan login.");
       Swal.fire({ icon: "success", title: "Akun berhasil dibuat!", text: "Silakan login untuk melanjutkan.", confirmButtonColor: "#A75D5D" })
       navigate("/login");
     } catch (err) {
       console.error(err);
-      Swal.fire({ icon: "error", title: "Gagal!", text: "Gagal mendaftar. Coba lagi ya!", confirmButtonColor: "#A75D5D" })
+      const msg = err?.response?.data?.error || "Gagal mendaftar. Coba lagi ya!";
+      Swal.fire({ icon: "error", title: "Gagal!", text: msg, confirmButtonColor: "#A75D5D" })
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleRegister = () => {
-    window.location.href = "https://aicourse.arfidakai.site/api/auth/google";
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   return (
