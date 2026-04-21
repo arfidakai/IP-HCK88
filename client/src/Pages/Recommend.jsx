@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import { api } from "../lib/api";
 import TrendingCard from "../components/TrendingCard";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
@@ -24,9 +24,7 @@ export default function Recommend() {
   const getRecommendations = async (keyword) => {
     setLoading(true);
     try {
-      const res = await axios.post("https://aicourse.arfidakai.site/api/recommend", {
-        interest: keyword,
-      });
+      const res = await api.post("/recommend", { interest: keyword });
       setVideos(res.data.videos || []);
     } catch (err) {
       console.error("Gagal memuat rekomendasi:", err);
@@ -76,7 +74,7 @@ export default function Recommend() {
         ...(userId ? { userId: Number(userId) } : {}),
       };
 
-      await axios.post("https://aicourse.arfidakai.site/api/list", body, {
+      await api.post("/list", body, {
         headers: { Authorization: authHeader, "Content-Type": "application/json" },
       });
 

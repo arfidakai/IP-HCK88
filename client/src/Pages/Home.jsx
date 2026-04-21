@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import { api } from "../lib/api";
 import ChatBubble from "../components/ChatBubble";
 import { jwtDecode } from "jwt-decode";
 import TrendingCard from "../components/TrendingCard";
@@ -80,10 +80,7 @@ if (token) {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "https://aicourse.arfidakai.site/api/consult",
-        { message: chatInput }
-      );
+      const res = await api.post("/consult", { message: chatInput });
 
       const aiReply = res.data.reply;
       const aiMsg = { sender: "bot", text: aiReply };
@@ -107,12 +104,7 @@ if (token) {
 
   const fetchRecommendedVideos = async (keyword) => {
     try {
-      const res = await axios.post(
-        "https://aicourse.arfidakai.site/api/recommend",
-        {
-          interest: keyword,
-        }
-      );
+      const res = await api.post("/recommend", { interest: keyword });
       setRecommendedVideos(res.data.videos || []);
       setShowRecommendations(true);
     } catch (err) {
@@ -135,7 +127,7 @@ if (token) {
         ? { Authorization: authHeader, "Content-Type": "application/json" }
         : { "Content-Type": "application/json" };
 
-      await axios.post("https://aicourse.arfidakai.site/api/list", body, { headers });
+      await api.post("/list", body, { headers });
 
       Swal.fire({
         icon: "success",
@@ -158,12 +150,7 @@ if (token) {
 
   const loadVideos = async () => {
     try {
-      const res = await axios.get(
-        "https://aicourse.arfidakai.site/api/trending",
-        {
-          params: { pageToken: nextPageToken },
-        }
-      );
+      const res = await api.get("/trending", { params: { pageToken: nextPageToken } });
 
       setVideos((prev) => [...prev, ...res.data.videos]);
       setNextPageToken(res.data.nextPageToken);
@@ -289,7 +276,7 @@ if (token) {
 
       <section>
         <h2 className="text-2xl font-semibold text-[#000000] mb-4">
-          🔥 Video Trending IT
+          🔥 Video Trending
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {videos.map((v, i) => (

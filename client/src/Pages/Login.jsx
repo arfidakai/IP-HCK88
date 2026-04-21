@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api, API_BASE } from "../lib/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -27,7 +27,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("https://aicourse.arfidakai.site/api/login", form);
+      const res = await api.post("/login", form);
       localStorage.setItem("authToken", res.data.token);
        Swal.fire({
         icon: "success",
@@ -38,10 +38,11 @@ export default function Login() {
       navigate("/");
     } catch (err) {
       console.error(err);
+      const msg = err?.response?.data?.error || "Email atau password salah!";
       Swal.fire({
         icon: "error",
         title: "Gagal Login",
-        text: "Email atau password salah!",
+        text: msg,
         confirmButtonColor: "#A75D5D",
       });
     } finally {
@@ -50,7 +51,7 @@ export default function Login() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://aicourse.arfidakai.site/api/auth/google";
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   return (

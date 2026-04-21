@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "../lib/api";
 import Swal from "sweetalert2";
 import { jwtDecode } from "jwt-decode";
 
@@ -13,7 +13,7 @@ const userId = token ? (() => { try { return jwtDecode(token).id } catch { retur
   const loadList = async () => {
   try {
     setLoading(true);
-    const res = await axios.get("https://aicourse.arfidakai.site/api/list", {
+    const res = await api.get("/list", {
       params: { userId } // ⬅️ kirim userId di query
     });
     setList(res.data);
@@ -27,7 +27,7 @@ const userId = token ? (() => { try { return jwtDecode(token).id } catch { retur
 const toggleStatus = async (id, currentStatus) => {
   try {
     const newStatus = currentStatus === "belum" ? "selesai" : "belum";
-    await axios.put(`https://aicourse.arfidakai.site/api/list/${id}?userId=${userId}`, {
+    await api.put(`/list/${id}?userId=${userId}`, {
       status: newStatus,
     });
     setList(prev => prev.map(v => v.id === id ? { ...v, status: newStatus } : v));
@@ -41,7 +41,7 @@ const removeFromList = async (id) => {
   if (!result.isConfirmed) return;
 
   try {
-    await axios.delete(`https://aicourse.arfidakai.site/api/list/${id}?userId=${userId}`);
+    await api.delete(`/list/${id}?userId=${userId}`);
     setList(prev => prev.filter(v => v.id !== id));
     Swal.fire({ icon: "success", title: "Berhasil!", text: "Video dihapus." });
   } catch (err) {

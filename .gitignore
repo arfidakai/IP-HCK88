@@ -1,2 +1,8 @@
 server/.env
 client/.env
+server/.env.test
+server/coverage/
+node_modules/
+.DS_Store
+dist/
+build/
